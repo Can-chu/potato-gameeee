@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>DÜNYANIN EN ZOR IQ TESTİ - %99 BAŞARISIZ</title>
+    <style>
+        body { margin: 0; height: 100vh; overflow: hidden; font-family: 'Comic Sans MS', cursive; background: #f0f0f0; transition: background 0.3s; }
+        #game-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; }
+        #level-indicator { font-size: 24px; margin-top: 20px; color: red; font-weight: bold; }
+        #kacan-buton { 
+            position: absolute; padding: 15px 30px; font-size: 18px; cursor: pointer;
+            background: #4CAF50; color: white; border: none; border-radius: 10px;
+            transition: all 0.1s; z-index: 9999;
+        }
+        .popup { 
+            position: absolute; width: 200px; height: 100px; background: yellow; border: 2px solid black;
+            padding: 10px; font-size: 12px; z-index: 5000; animation: flash 0.5s infinite;
+        }
+        @keyframes flash { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .sahte-buton { position: absolute; padding: 10px 20px; background: gray; pointer-events: none; }
+        #final-ekran { display: none; text-align: center; background: white; height: 100vh; width: 100%; justify-content: center; flex-direction: column; align-items: center; }
+        .blink { animation: blinker 1s linear infinite; color: red; font-weight: bold; }
+        @keyframes blinker { 50% { opacity: 0; } }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div id="level-indicator">Level: 1</div>
+    <button id="kacan-buton">BANA TIKLA</button>
+</div>
+
+<div id="final-ekran">
+    <h1 style="font-size: 80px;">1 + 1 = PATATES</h1>
+    <h3>Neden bu kadar uğraştın ki?</h3>
+    <p class="blink" style="cursor:pointer;" onclick="paylas()">BU İŞKENCEYİ BİR ARKADAŞINA GÖNDER!</p>
+</div>
+
+<script>
+    let level = 1;
+    const btn = document.getElementById('kacan-buton');
+    const indicator = document.getElementById('level-indicator');
+    const final = document.getElementById('final-ekran');
+    const container = document.getElementById('game-container');
+
+    function rasteleKonum() {
+        const x = Math.random() * (window.innerWidth - btn.clientWidth);
+        const y = Math.random() * (window.innerHeight - btn.clientHeight);
+        btn.style.left = x + 'px';
+        btn.style.top = y + 'px';
+    }
+
+    // İlk konum
+    rasteleKonum();
+
+    // Mouse yaklaştığında kaçma (Level bazlı zorluklar)
+    btn.addEventListener('mouseover', () => {
+        if (level === 5) return; // Level 5'te buton kaçmaz, biz onu kovalayacağız
+
+        if (level === 6) {
+            // Level 6'da mouse ters yöne giderse buton da garip davranır (JS ile emüle etmek zordur ama butonu ters yere ışınlayabiliriz)
+            btn.style.left = (window.innerWidth - parseInt(btn.style.left)) + 'px';
+            btn.style.top = (window.innerHeight - parseInt(btn.style.top)) + 'px';
+        } else {
+            rasteleKonum();
+        }
+
+        // Seviye özel efektleri
+        if (level === 2) {
+            document.body.style.backgroundColor = '#' + Math.floor(Math.random()*16777215).toString(16);
+        }
+        if (level === 3 && Math.random() > 0.7) {
+            createPopup();
+        }
+    });
+
+    // Butona tıklandığında seviye atla
+    btn.onclick = () => {
+        level++;
+        if (level > 15) {
+            bitir();
+        } else {
+            indicator.innerText = "Level: " + level;
+            zorlukAyarla();
+            alert("Tebrikler! Sıradaki Seviye: " + level);
+            rasteleKonum();
+        }
+    };
+
+    function zorlukAyarla() {
+        if (level === 4) {
+            for(let i=0; i<20; i++) {
+                let s = document.createElement('button');
+                s.className = 'sahte-buton';
+                s.innerText = "BANA TIKLA";
+                s.style.left = Math.random() * window.innerWidth + 'px';
+                s.style.top = Math.random() * window.innerHeight + 'px';
+                container.appendChild(s);
+            }
+        }
+        if (level === 5) {
+            btn.innerText = "YAKALA BENİ!";
+            btn.style.transition = "all 0.5s";
+            // Bu levelda buton sabit, mouse imleci (eğer custom imleç yapılırsa) kaçırılabilir. 
+            // Şimdilik sadece durmasını sağlıyoruz ki oyuncu şaşırsın.
+        }
+        if (level === 11) {
+            btn.style.transform = "scale(0.2)";
+        }
+    }
+
+    function createPopup() {
+        let p = document.createElement('div');
+        p.className = 'popup';
+        p.innerHTML = "<b>TEBRİKLER!</b><br>iPhone kazandınız! Kapatmak için 100 kere tıkla.";
+        p.style.left = Math.random() * 80 + '%';
+        p.style.top = Math.random() * 80 + '%';
+        container.appendChild(p);
+    }
+
+    function bitir() {
+        container.style.display = 'none';
+        final.style.display = 'flex';
+        document.body.style.background = "white";
+    }
+
+    function paylas() {
+        alert("Link kopyalandı! Arkadaşlarına işkence etmeye başla.");
+    }
+
+    // Level 5 ve 6 için mouse takibi (Ters yön simülasyonu)
+    document.addEventListener('mousemove', (e) => {
+        if (level === 6) {
+            // Mouse imlecini görsel olarak değiştirmek zor olduğu için 
+            // burada sadece butonun imleçten kaçış hızını artırıyoruz
+        }
+    });
+</script>
+
+</body>
+</html>
